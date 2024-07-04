@@ -1,28 +1,41 @@
-import React, { useEffect, useState } from "react";
-import "./../styles/App.css";
+
+import React, { useState, useEffect } from "react";
 
 const App = () => {
-  const [product, setProduct] = useState([]);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://dummyjson.com/products");
-        const data = await response.json();
-        setProducts(data.products);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    setLoading(true);
+    fetch("https://dummyjson.com/products")
+      .then((response) => response.json())
+      .then((json) => {
+        setData(json);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error);
+        setLoading(false);
+      });
   }, []);
-  
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>An error occurred: {error.message}</div>;
+  }
+
+  if (!data) {
+    return <div>No data found</div>;
+  }
+
   return (
     <div>
       <h1>Data Fetched from API</h1>
-      <pre>{JSON.stringify(product, null, 2)}</pre>
-    
+      <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
   );
 };
